@@ -6,7 +6,7 @@
       INTEGER N=10
       WRITE(*,*) '请输入工质速度'
       READ (*,*)VELOCITY
-      CALL   CENTRRAL_DIF
+      CALL   CENTRAL_DIF(N,VELOCITY)
       CALL   用上风格式的解的函数
       CALL   用混合格式解的函数
       CALL   用解析解解的函数
@@ -14,7 +14,7 @@
       END
 
 C     中心差分格式求解函数
-      FUNCTION CENTRAL_DIF（N,VELOCITY）
+      SUBROUTINE CENTRAL_DIF（N,VELOCITY）
       REAL LEN=1,DEN=1,GAMA=0.1
 *     后面用来循环初值用的整数 
       INTEGER I=2
@@ -72,7 +72,9 @@ C     解析解求解函数
  
  
 C     TDMA解法
-      FUCTION TDMA(AP,AE,AW,AC,N,X)
+      SUBROUTINE TDMA(AP,AE,AW,AC,N,X)
+      INTEGER N
+      REAL AP(N),AE(N),AW(N),AC(N),X(N)
       AE(1)=AE(1)/AP(1)
       AC(1)=AC(1)/AP(1)
       DO I=2，N
