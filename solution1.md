@@ -14,7 +14,7 @@
       PAUSE
       END
 
-C     中心差分格式求解函数
+*     中心差分格式求解函数
       SUBROUTINE CENTRAL_DIF(N,VELOCITY)
       REAL VELOCITY
       INTEGER N
@@ -23,11 +23,6 @@ C     中心差分格式求解函数
       REAL AP(10),AE(10),AW(10),AC(10),X(10)
 *     后面用来循环初值用的整数 
       INTEGER I
-C      ALLOCATE(AP(N))
-C      ALLOCATE(AE(N))
-C      ALLOCATE(AW(N))
-C      ALLOCATE(AC(N))
-C      ALLOCATE(X(N))
       FAI0=1
       FAIL=0
       I=2
@@ -66,7 +61,7 @@ C      ALLOCATE(X(N))
       END
 
 
-C     迎风格式求解函数
+*     迎风格式求解函数
       SUBROUTINE UPWIND(N,VELOCITY)
       INTEGER N
       REAL VELOCITY
@@ -92,7 +87,7 @@ C     右边界网格
       AW(10)=D+F
       AC(10)=(2* D-F)* FAIL
       
-C     中间网格
+*     中间网格
       DO 40, I=2,9,1
           AP(I)=2* D+F
           AE(I)=D
@@ -106,7 +101,7 @@ C     中间网格
       END DO
       END
       
-C     混合格式求解函数
+*     混合格式求解函数
       SUBROUTINE MIX(N,VELOCITY)
       INTEGER N
       REAL VELOCITY
@@ -192,12 +187,12 @@ C     TDMA解法
       AE(1)=AE(1)/(AP(1))
       AC(1)=AC(1)/(AP(1))
       DO 100, I=2,N,1
-          AE(I)=(AE(I))/((AP(I))-(AW(I))*(AE(I-1)))
-          AC(I)=((AC(I))+(AW(I))*(AC(I-1)))/((AP(I))-(AW(I))*(AE(I-1)))
+          AE(I)=(AE(I))/((AP(I))-(AW(I))* (AE(I-1)))
+          AC(I)=((AC(I))+(AW(I))* (AC(I-1)))/((AP(I))-(AW(I))* (AE(I-1)))
 100    CONTINUE
       X(10)=(AC(10))
       DO 20, I=N-1,1,-1
-          X(I)=AE(I)*X(I+1)+AC(I)
+          X(I)=AE(I)* X(I+1)+AC(I)
 20    CONTINUE
       END 
           
