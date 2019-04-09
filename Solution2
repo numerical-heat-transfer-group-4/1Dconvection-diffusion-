@@ -1,0 +1,153 @@
+    program HW02
+
+    implicit none
+
+    integer, parameter :: rou = 1
+    real, parameter :: gama = 0.1
+    real, parameter :: L = 1.0
+    integer, parameter:: mesh = 10
+    real :: velocity, delta_x, F, D
+    
+    real :: fai(mesh+2)
+    real :: new_fai(mesh+2)
+    real :: a_p(2:mesh+1), a_w(2:mesh+1), a_e(2:mesh+1)
+   
+    print*, "输入速度："
+    read(*,*) velocity
+    open(1, position='rewind', file='result.csv')
+    write(1,*) "速度=", velocity
+    close(1)
+    delta_x = L/mesh
+    F = rou*velocity
+    D = gama/delta_x
+
+    call centralDifference(mesh, F, D,a_p, a_w, a_e)
+    open(1, position='Append', file='result.csv')
+    write(1,*) "中心差分格式"
+    close(1)
+    call calculate(mesh, new_fai, fai, a_w, a_e, a_p)
+    call upwind(mesh, F, D,a_p, a_w, a_e)
+    open(1, position='Append', file='result.csv')
+    write(1,*) "迎风格式"
+    close(1)
+    call calculate(mesh, new_fai, fai, a_w, a_e, a_p)
+    call mixed(mesh, F, D,a_p, a_w, a_e)
+    open(1, position='Append', file='result.csv')
+    write(1,*) "混合格式"
+    close(1)
+    call calculate(mesh, new_fai, fai, a_w, a_e, a_p)
+    
+    end program HW02
+
+    subroutine calculate(N, new_fai, fai, a_w, a_e, a_p)
+    implicit none
+    integer :: N, i
+    real :: fai(N+2), new_fai(N+2)
+    real :: a_p(2:N+1), a_w(2:N+1), a_e(2:N+1)
+    real :: error = 1.0  !误差
+    !φ数组初始化
+    fai(1) = 1
+    fai(2:N+1) = 100
+    fai(N+2) = 0
+    new_fai = fai
+    
+    do
+        do i = 2, N+1
+            new_fai(i) = (a_w(i)*fai(i-1) + a_e(i)*fai(i+1))/a_p(i)
+        end do
+        error = maxval(abs(fai-new_fai))
+        if (error < 0.0000001) then   !满足误差要求，停止循环
+            exit
+        else
+            fai = new_fai  !进行下一次循环
+        end if
+    end do       
+    
+    open(1, position='Append', file='result.csv') 
+    do i = 1, N + 2
+        write(1,*) fai(i)
+    end do
+    close(1)
+    end subroutine calculate
+    
+    subroutine centralDifference(N, F, D, a_p, a_w, a_e)
+    implicit none
+    integer :: N, i
+    real :: F, D
+    real :: a_p(2:N+1), a_w(2:N+1), a_e(2:N+1)
+    
+    do i = 2, N + 1
+        if (i == 2) then
+            a_w(i) = 2*D + F/2
+        else
+            a_w(i) = D + F/2
+        end if
+    end do
+    
+    do i = 2, N + 1
+        if (i == N + 1) then
+            a_e(i) = 2*D - F/2
+        else
+            a_e(i) = D - F/2
+        end if
+    end do       
+    
+    do i = 2, N + 1
+        a_p(i) = a_e(i) + a_w(i)
+    end do    
+    end subroutine centralDifference
+     
+    subroutine upwind(N, F, D, a_p, a_w, a_e)
+    implicit none
+    integer :: N, i
+    real :: F, D
+    real :: a_p(2:N+1), a_w(2:N+1), a_e(2:N+1)
+    
+    do i = 2, N + 1
+        if (i == 2) then
+            a_w(i) = 2*D + max(F,0.0)
+        else
+            a_w(i) = D + max(F,0.0)
+        end if
+    end do
+    
+    do i = 2, N + 1
+        if (i == N+1) then
+            a_e(i) = 2*D + max(-F,0.0)
+        else
+            a_e(i) = D + max(-F,0.0)
+        end if
+    end do       
+    
+    do i = 2, N + 1
+        a_p(i) = a_e(i) + a_w(i)
+    end do    
+    
+    end subroutine upwind
+    
+    subroutine mixed(N, F, D, a_p, a_w, a_e)
+    implicit none
+    integer :: N, i
+    real :: F, D
+    real :: a_p(2:N+1), a_w(2:N+1), a_e(2:N+1)
+
+    do i = 2, N + 1
+        if (i == 2) then
+            a_w(i) = max(F, 2*D + F/2, 0.0) 
+        else
+            a_w(i) = max(F, D + F/2, 0.0)
+        end if
+    end do
+    
+    do i = 2, N + 1
+        if (i == N + 1) then
+            a_e(i) = max(-F, 2*D - F/2, 0.0)
+        else
+            a_e(i) = max(-F, D - F/2, 0.0)
+        end if
+    end do       
+    
+    do i = 2, N + 1
+        a_p(i) = a_e(i) + a_w(i)
+    end do      
+    end subroutine mixed
