@@ -51,7 +51,7 @@
           AE(I)=D-F/2
           AW(I)=D+F/2
           AC(I)=0
-10    CONTINUE      
+ 10    CONTINUE      
       CALL TDMA(AP,AE,AW,AC,N,X)
       OPEN(UNIT=1,FILE='CENTRAL_DIF.txt')
       DO K=1,N,1
@@ -75,13 +75,13 @@
       F=VELOCITY* DEN
       DELTAX=LEN/N
       D=GAMA/DELTAX
-C     左边界网格
+*     左边界网格
       AP(1)=3* D+F
       AE(1)=D
       AW(1)=0
       AC=(2* D+F)* FAI0
       
-C     右边界网格
+*     右边界网格
       AP(10)=3* D
       AE(10)=0
       AW(10)=D+F
@@ -93,7 +93,7 @@ C     右边界网格
           AE(I)=D
           AW(I)=D+F
           AC(I)=0
- 40   CONTINUE
+  40   CONTINUE
       CALL TDMA(AP,AE,AW,AC,N,X)
       OPEN(UNIT=1,FILE='UPWIND.txt')
       DO K=1,N,1
@@ -130,7 +130,7 @@ C     右边界网格
           AE(I)=D-F/2
           AW(I)=D+F/2
           AC(I)=0
-50    CONTINUE  
+ 50    CONTINUE  
       ELSE
       AP(1)=3*D+F
       AE(1)=D
@@ -145,7 +145,7 @@ C     右边界网格
           AE(I)=D
           AW(I)=D+F
           AC(I)=0
- 60   CONTINUE
+  60   CONTINUE
       END IF
       CALL TDMA(AP,AE,AW,AC,N,X)
       OPEN(UNIT=1,FILE='MIX.txt')
@@ -155,7 +155,7 @@ C     右边界网格
       RETURN 
       END
  
-C     解析解求解函数
+*     解析解求解函数
       SUBROUTINE SOLUTION(N,VELOCITY)
       INTEGER N
       REAL VELOCITY
@@ -168,9 +168,9 @@ C     解析解求解函数
       FAIL=0
       DO 30,I=1,N,1
           X(I)=(FAIL-FAI0)
-     1*(EXP(DEN* VELOCITY*(I-0.5)*DELTAX/GAMA)-1)
-     1/(EXP(DEN* VELOCITY*LEN/GAMA)-1)+FAI0 
-30    CONTINUE          
+     1*(EXP(DEN* VELOCITY*(I-0.5)* DELTAX/GAMA)-1)
+     1/(EXP(DEN* VELOCITY* LEN/GAMA)-1)+FAI0 
+ 30    CONTINUE          
       OPEN(UNIT=1,FILE='SOLUTION.txt')
       DO K=1,N,1
       WRITE(1,* )  X(K)
@@ -179,7 +179,7 @@ C     解析解求解函数
       END
  
  
-C     TDMA解法
+*     TDMA解法
       SUBROUTINE TDMA(AP,AE,AW,AC,N,X)
       INTEGER N
       INTEGER I
@@ -189,11 +189,11 @@ C     TDMA解法
       DO 100, I=2,N,1
           AE(I)=(AE(I))/((AP(I))-(AW(I))* (AE(I-1)))
           AC(I)=((AC(I))+(AW(I))* (AC(I-1)))/((AP(I))-(AW(I))* (AE(I-1)))
-100    CONTINUE
+ 100    CONTINUE
       X(10)=(AC(10))
       DO 20, I=N-1,1,-1
           X(I)=AE(I)* X(I+1)+AC(I)
-20    CONTINUE
+ 20    CONTINUE
       END 
           
       
