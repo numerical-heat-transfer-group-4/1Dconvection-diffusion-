@@ -52,22 +52,15 @@ C      ALLOCATE(X(N))
       
 *     中间网格的系数
       DO 10 ,I=2,N-1,1
-          AP(I)=2*D
+          AP(I)=2* D
           AE(I)=D-F/2
           AW(I)=D+F/2
           AC(I)=0
 10    CONTINUE      
- 
-C      DATA (AP(I),K=2,9)/8*(2*D)/
-C      DATA (AE(I),K=2,9)/8*(D-F/2)/
-C      DATA (AW(I),K=2,9)/8*(D+F/2)/
-C      DATA (AC(I),K=2,9)/8*0/
-      
-
       CALL TDMA(AP,AE,AW,AC,N,X)
       OPEN(UNIT=1,FILE='CENTRAL_DIF.txt')
       DO K=1,N,1
-      WRITE(1,*)  X(K)
+      WRITE(1,* )  X(K)
       END DO
       RETURN
       END
@@ -79,30 +72,29 @@ C     迎风格式求解函数
       REAL VELOCITY
       REAL LEN,DEN,GAMA,F,D,DELTAX,FAI0,FAIL
       REAL AP(10),AE(10),AW(10),AC(10),X(10)
-      
       FAI0=1
       FAIL=0
       LEN=1
       DEN=1
       GAMA=0.1
-      F=VELOCITY*DEN
+      F=VELOCITY* DEN
       DELTAX=LEN/N
       D=GAMA/DELTAX
 C     左边界网格
-      AP(1)=3*D+F
+      AP(1)=3* D+F
       AE(1)=D
       AW(1)=0
-      AC=(2*D+F)*FAI0
+      AC=(2* D+F)* FAI0
       
 C     右边界网格
-      AP(10)=3*D
+      AP(10)=3* D
       AE(10)=0
       AW(10)=D+F
-      AC(10)=(2*D-F)*FAIL
+      AC(10)=(2* D-F)* FAIL
       
 C     中间网格
       DO 40, I=2,9,1
-          AP(I)=2*D+F
+          AP(I)=2* D+F
           AE(I)=D
           AW(I)=D+F
           AC(I)=0
@@ -110,7 +102,7 @@ C     中间网格
       CALL TDMA(AP,AE,AW,AC,N,X)
       OPEN(UNIT=1,FILE='UPWIND.txt')
       DO K=1,N,1
-      WRITE(1,*)  X(K)
+      WRITE(1,* )  X(K)
       END DO
       END
       
@@ -120,14 +112,13 @@ C     混合格式求解函数
       REAL VELOCITY
       REAL LEN,DEN,GAMA,DELTAX,FAI0,FAIL
       REAL AP(10),AE(10),AW(10),AC(10),X(10)
-      
       LEN=1
       DEN=1
       GAMA=0.1
       DELTAX=LEN/N
       FAI0=1
       FAIL=0
-      F=DEN*VELOCITY
+      F=DEN* VELOCITY
       D=GAMA/DELTAX
       P=F/D
       IF(ABS(P)<2) THEN
@@ -135,13 +126,10 @@ C     混合格式求解函数
       AE(1)=D-F/2
       AW(1)=0
       AC(1)=(F+2*(D))*FAI0
-      
       AP(10)=3*(D)-F/2
       AE(10)=0
       AW(10)=D+F/2
       AC(10)=(F+2*(D))*FAIL
-      
-
       DO 50 ,I=2,N-1,1
           AP(I)=2*D
           AE(I)=D-F/2
@@ -153,22 +141,16 @@ C     混合格式求解函数
       AE(1)=D
       AW(1)=0
       AC=(2*D+F)*FAI0
-      
-
       AP(10)=3*D
       AE(10)=0
       AW(10)=D+F
       AC(10)=(2*D-F)*FAIL
-      
-
       DO 60, I=2,9,1
           AP(I)=2*D+F
           AE(I)=D
           AW(I)=D+F
           AC(I)=0
  60   CONTINUE
-          
-          
       END IF
       CALL TDMA(AP,AE,AW,AC,N,X)
       OPEN(UNIT=1,FILE='MIX.txt')
@@ -191,12 +173,12 @@ C     解析解求解函数
       FAIL=0
       DO 30,I=1,N,1
           X(I)=(FAIL-FAI0)
-     1*(EXP(DEN*VELOCITY*(I-0.5)*DELTAX/GAMA)-1)
-     1/(EXP(DEN*VELOCITY*LEN/GAMA)-1)+FAI0 
+     1*(EXP(DEN* VELOCITY*(I-0.5)*DELTAX/GAMA)-1)
+     1/(EXP(DEN* VELOCITY*LEN/GAMA)-1)+FAI0 
 30    CONTINUE          
       OPEN(UNIT=1,FILE='SOLUTION.txt')
       DO K=1,N,1
-      WRITE(1,*)  X(K)
+      WRITE(1,* )  X(K)
       END DO
       RETURN 
       END
